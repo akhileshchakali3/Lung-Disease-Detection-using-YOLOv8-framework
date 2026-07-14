@@ -77,7 +77,7 @@ analyzeBtn.addEventListener('click', async () => {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const response = await fetch('http://localhost:8000/analyze', {
+        const response = await fetch('https://lung-disease-detection-using-yolov8.onrender.com/analyze', {
             method: 'POST',
             body: formData
         });
@@ -193,7 +193,7 @@ async function generatePDF() {
     };
 
     try {
-        const response = await fetch('http://localhost:8000/download-report', {
+        const response = await fetch('https://lung-disease-detection-using-yolov8.onrender.com/download-report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData)
@@ -277,7 +277,7 @@ async function sendMessage() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-        const response = await fetch('http://localhost:8000/chat', {
+        const response = await fetch('https://lung-disease-detection-using-yolov8.onrender.com/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
