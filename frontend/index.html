@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LungVision AI - Advanced Disease Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-lungs-virus"></i>
+            <span>LungVision <strong>AI</strong></span>
+        </div>
+       
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <header class="page-header">
+            <h1>Class Balanced-Lung Disease Detection</h1>
+            <p>Upload a chest X-Ray to instantly analyze for Nodules, Tuberculosis, or Tumors using our advanced YOLOv8 AI model.</p>
+        </header>
+
+        <section class="analysis-section">
+            <!-- Left Panel: Upload Image -->
+            <div class="card upload-card">
+                <h2><i class="fa-solid fa-upload"></i> Upload Scan</h2>
+                
+                <div class="drag-drop-area" id="drop-area">
+                    <input type="file" id="image-upload" accept="image/*" hidden>
+                    <label for="image-upload" class="upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
+                        <h3>Drag & Drop your X-Ray here</h3>
+                        <p>or click to browse files</p>
+                    </label>
+                    <img id="image-preview" src="" alt="Image Preview" style="display:none;">
+                </div>
+
+                <button id="analyze-btn" class="primary-btn" disabled>
+                    <i class="fa-solid fa-microscope"></i> Analyze Image
+                </button>
+                <div id="loading-spinner" class="spinner" style="display:none;">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing with YOLOv8...
+                </div>
+            </div>
+
+            <!-- Right Panel: Results & Details -->
+            <div class="card results-card">
+                <h2><i class="fa-solid fa-clipboard-check"></i> Analysis Results</h2>
+                
+                <div id="results-placeholder" class="placeholder-text">
+                    <p>Upload and analyze an image to view results here.</p>
+                </div>
+                
+                <div id="results-content" style="display:none;">
+                    <div class="result-image-container">
+                        <img id="result-image" src="" alt="Analyzed Result">
+                        <div class="overlay-badge">AI Analyzed</div>
+                    </div>
+                    
+                    <div class="findings">
+                        <h3>Detected Diseases</h3>
+                        <ul id="detected-list" class="detected-list">
+                            <!-- List items injected via JS -->
+                        </ul>
+                        
+                        <h3>AI Recommendations</h3>
+                        <ul id="recommendation-list" class="recommendation-list">
+                            <!-- Recommendations injected via JS -->
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
+                        <button id="open-report-modal" class="secondary-btn">
+                            <i class="fa-solid fa-file-pdf"></i> Generate PDF Report
+                        </button>
+                        <button id="clear-results-btn" class="primary-btn" style="background:#ef4444; border:none;">
+                            <i class="fa-solid fa-rotate-left"></i> Analyze Another Scan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chatbot Floating UI -->
+        <div class="chatbot-widget">
+            <button id="chatbot-toggle" class="chatbot-toggle">
+                <i class="fa-solid fa-message"></i>
+            </button>
+            <div class="chatbot-container" id="chatbot-container" style="display:none;">
+                <div class="chat-header">
+                    <h4>AI Health Assistant</h4>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="clear-chat" title="Clear Chat" style="background:none; border:none; color:white; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        <button id="close-chat" title="Close Chat" style="background:none; border:none; color:white; cursor:pointer;"><i class="fa-solid fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="msg bot-msg">Hello! I am your AI health assistant. Feel free to ask me anything about lung diseases.</div>
+                </div>
+                <div class="chat-input-area">
+                    <button id="mic-btn" title="Click to speak"><i class="fa-solid fa-microphone"></i></button>
+                    <input type="text" id="chat-input" placeholder="Type a message...">
+                    <button id="send-chat"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Details Modal for PDF -->
+        <div id="patient-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Patient Details</h2>
+                <p>Please enter patient details for the PDF Report</p>
+                <form id="patient-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="patient-name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="patient-age" required placeholder="45">
+                    </div>
+                    <div class="form-group">
+                        <label>Sex</label>
+                        <select id="patient-sex" required style="width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 0.5rem; outline: none;">
+                            <option value="">Select Sex</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="patient-email" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile</label>
+                        <input type="tel" id="patient-mobile" required placeholder="+1 234 567 8900">
+                    </div>
+                    <button type="submit" class="primary-btn submit-btn">
+                        <i class="fa-solid fa-download"></i> Download Report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
