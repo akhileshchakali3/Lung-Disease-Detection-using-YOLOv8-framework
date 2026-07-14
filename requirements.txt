@@ -9,3 +9,6 @@ pydantic
 pillow
 python-dotenv
 reportlab
+torch
+torchvision
+numpy
